@@ -1,26 +1,12 @@
 {
   "name": "chess-physics",
   "version": "1.0.0",
-  "description": "Chess Physics: Vectores y Leyes de Newton - Plataforma Educativa Interactiva",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "npx http-server . -p 8080 -c-1",
+    "build": "mkdir -p dist && cp *.html dist/ && cp -r js dist/ 2>/dev/null || true && cp -r public/* dist/ 2>/dev/null || true",
+    "preview": "npx http-server dist -p 8080 -c-1"
   },
-  "keywords": [
-    "chess",
-    "physics",
-    "vectors",
-    "newton",
-    "education",
-    "interactive"
-  ],
   "author": "Chess Physics Team",
-  "license": "MIT",
-  "dependencies": {
-    "astro": "^4.0.0"
-  }
+  "license": "MIT"
 }
