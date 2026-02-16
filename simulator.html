@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Physics - Simulador Interactivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2cc",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f172a",
+                        "secondary-dark": "#1e293b",
+                        "accent-blue": "#38bdf8",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chess-board-canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .physics-card {
+            background: linear-gradient(135deg, rgba(13, 242, 204, 0.1) 0%, rgba(56, 189, 248, 0.05) 100%);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(13, 242, 204, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(13, 242, 204, 0.8); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white font-display min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">hub</span>
+                <span class="text-lg font-bold text-primary">Chess Physics</span>
+            </div>
+            <nav class="hidden md:flex gap-8">
+                <a href="index.html" class="text-sm font-medium text-slate-300 hover:text-primary transition-colors">Inicio</a>
+                <a href="lesson.html" class="text-sm font-medium text-slate-300 hover:text-primary transition-colors">Lecciones</a>
+                <a href="simulator.html" class="text-sm font-medium text-primary transition-colors">Simulador</a>
+                <a href="newton.html" class="text-sm font-medium text-slate-300 hover:text-primary transition-colors">Conceptos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <!-- Hero Section -->
+        <section class="relative py-12 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl md:text-5xl font-black text-white mb-4">
+                    Simulador de <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-blue">Física de Ajedrez</span>
+                </h1>
+                <p class="text-lg text-slate-400 max-w-2xl mb-8">
+                    Visualiza vectores, calcula fuerzas y acelera piezas de ajedrez usando las leyes de Newton.
+                </p>
+            </div>
+        </section>
+
+        <!-- Simulator Section -->
+        <section class="py-8 bg-secondary-dark/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:grid lg:grid-cols-3 lg:gap-8">
+                    <!-- Board (Left/Center) -->
+                    <div class="lg:col-span-2 mb-8 lg:mb-0">
+                        <div class="glass-panel p-6 rounded-lg">
+                            <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">board_control</span>
+                                Tablero Interactivo
+                            </h2>
+                            <p class="text-slate-400 text-sm mb-6">
+                                <strong>Instrucciones:</strong> Haz clic en una pieza para seleccionarla. Luego haz clic en una casilla destino. 
+                                Observa cómo se calcula la trayectoria usando vectores y leyes de movimiento.
+                            </p>
+                            <div id="board-container" class="flex justify-center bg-slate-900 rounded-lg p-4"></div>
+                        </div>
+                    </div>
+
+                    <!-- Physics Data (Right) -->
+                    <div class="space-y-4">
+                        <!-- Force Card -->
+                        <div class="glass-panel p-6 rounded-lg physics-card">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">speed</span>
+                                <h3 class="font-bold text-white">Fuerza (N)</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-3xl font-mono font-bold text-primary pulse-glow" id="force-value">0.00</div>
+                                <div class="text-xs text-slate-400 font-mono">
+                                    <div>Fx: <span class="text-accent-blue" id="force-x">0.00</span></div>
+                                    <div>Fy: <span class="text-accent-blue" id="force-y">0.00</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acceleration Card -->
+                        <div class="glass-panel p-6 rounded-lg physics-card">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">trending_up</span>
+                                <h3 class="font-bold text-white">Aceleración (m/s²)</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-3xl font-mono font-bold text-accent-blue" id="acceleration-value">0.00</div>
+                                <div class="text-xs text-slate-400 font-mono">
+                                    <div>ax: <span class="text-primary" id="accel-x">0.00</span></div>
+                                    <div>ay: <span class="text-primary" id="accel-y">0.00</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Velocity Card -->
+                        <div class="glass-panel p-6 rounded-lg physics-card">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">arrow_forward</span>
+                                <h3 class="font-bold text-white">Velocidad (m/s)</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-3xl font-mono font-bold text-primary" id="velocity-value">0.00</div>
+                                <div class="text-xs text-slate-400 font-mono">
+                                    <div>Ángulo: <span class="text-accent-blue" id="angle-value">0°</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Masa Seleccionada -->
+                        <div class="glass-panel p-6 rounded-lg">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                                <h3 class="font-bold text-white">Pieza Seleccionada</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-lg font-bold text-white" id="piece-name">Ninguna</div>
+                                <div class="text-sm text-slate-400">
+                                    Movimientos: <span class="font-mono text-primary" id="piece-mass">0 movimientos válidos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formula Section -->
+        <section class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-white mb-8">Fórmulas Utilizadas</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Formula 1 -->
+                    <div class="glass-panel p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-primary mb-4">Segunda Ley de Newton</h3>
+                        <div class="bg-slate-900 p-4 rounded font-mono text-center text-primary">
+                            F = m × a
+                        </div>
+                        <p class="text-slate-400 text-sm mt-4">
+                            La fuerza es igual a la masa (cantidad de movimientos válidos) multiplicada por la aceleración. 
+                            Piezas con más opciones de movimiento generan mayor fuerza.
+                        </p>
+                    </div>
+
+                    <!-- Formula 2 -->
+                    <div class="glass-panel p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-primary mb-4">Vector de Desplazamiento</h3>
+                        <div class="bg-slate-900 p-4 rounded font-mono text-center text-primary">
+                            v = √(vx² + vy²)
+                        </div>
+                        <p class="text-slate-400 text-sm mt-4">
+                            El vector resultante se descompone en componentes cartesianas (X, Y) 
+                            para visualizar la trayectoria en 2D.
+                        </p>
+                    </div>
+
+                    <!-- Formula 3 -->
+                    <div class="glass-panel p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-primary mb-4">Cinemática</h3>
+                        <div class="bg-slate-900 p-4 rounded font-mono text-center text-primary">
+                            x = x₀ + v·t + ½·a·t²
+                        </div>
+                        <p class="text-slate-400 text-sm mt-4">
+                            Ecuación de movimiento que describe la posición de una pieza 
+                            en función del tiempo.
+                        </p>
+                    </div>
+
+                    <!-- Formula 4 -->
+                    <div class="glass-panel p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-primary mb-4">Magnitud del Vector</h3>
+                        <div class="bg-slate-900 p-4 rounded font-mono text-center text-primary">
+                            |v| = √(Δx² + Δy²)
+                        </div>
+                        <p class="text-slate-400 text-sm mt-4">
+                            Calcula la distancia recorrida entre dos puntos en el tablero.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-secondary-dark border-t border-white/10 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-500">hub</span>
+                <span class="text-slate-500 font-medium">Chess Physics © 2026</span>
+            </div>
+            <div class="flex gap-6">
+                <a href="index.html" class="text-slate-500 hover:text-white transition-colors text-sm">Inicio</a>
+                <a href="lesson.html" class="text-slate-500 hover:text-white transition-colors text-sm">Lecciones</a>
+                <a href="simulator.html" class="text-slate-500 hover:text-white transition-colors text-sm">Simulador</a>
+                <a href="newton.html" class="text-slate-500 hover:text-white transition-colors text-sm">Conceptos</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts de Física -->
+    <script src="/js/physics-engine.js"></script>
+    <script src="/js/simulator.js"></script>
+
+    <!-- Initialize Simulator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const simulator = new ChessBoardSimulator('board-container', 8, 8);
+
+            // Actualizar datos de pieza seleccionada en tiempo real
+            const updateInterval = setInterval(() => {
+                const pieceInfo = simulator.getSelectedPieceInfo();
+                
+                if (pieceInfo) {
+                    document.getElementById('piece-name').textContent = pieceInfo.name;
+                    document.getElementById('piece-mass').textContent = simulator.validMovesCount + ' movimientos válidos';
+                    
+                    // Solo mostrar fuerza, velocidad y ángulo si hay datos de física calculados
+                    if (simulator.hasPhysicsData) {
+                        // Mostrar fuerza con sus componentes
+                        document.getElementById('force-value').textContent = simulator.lastForce.toFixed(2);
+                        const forceX = simulator.lastForce * Math.cos(simulator.lastAngle * Math.PI / 180);
+                        const forceY = simulator.lastForce * Math.sin(simulator.lastAngle * Math.PI / 180);
+                        document.getElementById('force-x').textContent = forceX.toFixed(2);
+                        document.getElementById('force-y').textContent = forceY.toFixed(2);
+                        
+                        // Mostrar velocidad y ángulo
+                        document.getElementById('velocity-value').textContent = simulator.lastVelocity.toFixed(2);
+                        document.getElementById('angle-value').textContent = simulator.lastAngle.toFixed(1) + '°';
+                    }
+                } else {
+                    document.getElementById('piece-name').textContent = 'Ninguna';
+                    document.getElementById('piece-mass').textContent = '0 movimientos válidos';
+                    // No resetear fuerza y velocidad cuando no hay pieza seleccionada
+                    // Se mantienen los últimos valores calculados
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

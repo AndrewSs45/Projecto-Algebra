@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vector Dynamics &amp; F=ma Widget</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2cc",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#102320",
+                        "surface-dark": "#18342f",
+                        "surface-light": "#ffffff"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #102320; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #224942; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0df2cc; 
+        }.bg-grid-pattern {
+            background-image: linear-gradient(to right, #1f423d 1px, transparent 1px),
+                              linear-gradient(to bottom, #1f423d 1px, transparent 1px);
+            background-size: 40px 40px;
+        }input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0df2cc;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 0 10px rgba(13, 242, 204, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #224942;
+            border-radius: 2px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #2c5c53;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-background-dark">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-[#224942] bg-background-light/95 dark:bg-[#102320]/95 backdrop-blur-sm px-6 lg:px-10 py-3">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-3xl">token</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Physics &amp; Chess</h2>
+</div>
+<nav class="hidden md:flex flex-1 justify-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="index.html">Inicio</a>
+<a class="text-primary text-sm font-medium" href="lesson.html">Lecciones</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="simulator.html">Simulador</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="newton.html">Conceptos</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-200 dark:hover:bg-[#18342f] transition-colors">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 border-2 border-slate-200 dark:border-[#224942]" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDHOflq5Ssu_gA03faO4gLF9gKi6EmoZIiDhGkauwmKAZc1WGzuiP2-Pi6UokGn9NmhaHYc7PbFghVq6gOAoydDDm0Q9uH5M4LC_9mnB2jtYh3fFWekxVgIz0Sx4TYIVLkpgpLaY6uSgYGzEXwcXpUrjfPcTrk6Xob0DSNugxi2ViZDEvdXHncvs6RaYHU5L3z16JOyhtsfRW5h01VVf6WHMgG0SfIGRnAHdvku94yOGbdI-k7rJVxe9ZnJn_myBkyM4EDTVQJEoKE");'></div>
+</div>
+</header>
+<main class="flex-grow flex flex-col lg:flex-row h-[calc(100vh-65px)] overflow-hidden">
+<div class="flex-1 flex flex-col overflow-y-auto lg:border-r border-slate-200 dark:border-[#224942]">
+<div class="flex flex-wrap items-center gap-2 px-6 lg:px-10 py-6 text-sm">
+<a class="text-primary hover:underline font-medium" href="index.html">Home</a>
+<span class="text-slate-400 dark:text-slate-600">/</span>
+<a class="text-primary hover:underline font-medium" href="lesson.html">Lessons</a>
+<span class="text-slate-400 dark:text-slate-600">/</span>
+<span class="text-slate-700 dark:text-white font-medium">Newton's Second Law (F=ma)</span>
+</div>
+<div class="px-6 lg:px-10 pb-6">
+<h1 class="text-3xl lg:text-4xl font-black leading-tight tracking-tight mb-3">Segunda Ley de Newton: Ley Fundamental de la Dinámica</h1>
+<p class="text-slate-600 dark:text-[#90cbc1] text-lg max-w-3xl">Acá podremos observar como se podrían aplicar los conceptos de la segunda ley de Newton, cuya formula es F = ma (Fuerza = masa × aceleración).</p>
+</div>
+<div class="px-6 lg:px-10 pb-6 flex-grow flex flex-col min-h-[400px]">
+<div class="relative w-full h-full bg-white dark:bg-[#0c1816] rounded-xl shadow-inner border border-slate-200 dark:border-[#224942] overflow-hidden flex flex-col">
+<div class="absolute top-4 left-4 z-10 bg-white/90 dark:bg-[#18342f]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-200 dark:border-[#224942] shadow-sm flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Simulación en vivo</span>
+</div>
+<div class="h-4 w-px bg-slate-300 dark:bg-[#224942]"></div>
+<div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-base">grid_on</span>
+<span>Grid: 1m x 1m</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-grid-pattern opacity-20"></div>
+<div class="relative w-full h-full flex items-center justify-center">
+<div class="absolute left-[10%] top-1/2 -translate-y-1/2 w-[30%] h-2 bg-gradient-to-r from-transparent to-primary/20 rounded-full blur-sm"></div>
+<div class="relative group cursor-pointer transform transition-transform hover:scale-105">
+<div class="absolute left-full top-1/2 -translate-y-1/2 ml-4 flex items-center">
+<div class="h-1 w-24 bg-primary rounded-l-full"></div>
+<div class="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-primary border-b-[6px] border-b-transparent"></div>
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-primary text-xs font-bold">F = 50N</span>
+</div>
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-900 dark:bg-[#102320] px-2 py-0.5 rounded text-[10px] font-mono border border-slate-700 dark:border-[#224942] text-slate-400">
+                            m = 5kg
+                        </div>
+<div class="size-20 bg-slate-100 dark:bg-[#18342f] rounded-xl border-2 border-primary shadow-[0_0_15px_rgba(13,242,204,0.3)] flex items-center justify-center text-primary relative z-10">
+<span class="material-symbols-outlined text-5xl">chess_pawn</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-4 right-4 flex gap-2">
+<button aria-label="Reset View" class="bg-white dark:bg-[#18342f] text-slate-700 dark:text-white p-2 rounded-lg border border-slate-200 dark:border-[#224942] hover:bg-slate-50 dark:hover:bg-[#224942] transition-colors">
+<span class="material-symbols-outlined">restart_alt</span>
+</button>
+<button aria-label="Fullscreen" class="bg-white dark:bg-[#18342f] text-slate-700 dark:text-white p-2 rounded-lg border border-slate-200 dark:border-[#224942] hover:bg-slate-50 dark:hover:bg-[#224942] transition-colors">
+<span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-6 lg:px-10 pb-10">
+<div class="bg-slate-100 dark:bg-[#18342f]/50 p-6 rounded-lg border border-slate-200 dark:border-[#224942] flex gap-4 items-start">
+<span class="material-symbols-outlined text-primary mt-1">lightbulb</span>
+<div>
+<h3 class="font-bold text-lg mb-2 text-slate-900 dark:text-white">Para entender la relación</h3>
+<p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
+                        Observemos como la fuerza de un <span class="font-bold text-primary">peón (Tiene baja Masa)</span> Resulta con una gran aceleración a la  <span class="font-bold text-primary">La reina (Cuenta con gran masa)</span>. Esto se debe a que la fuerza aplicada es la misma, pero la masa del peón es mucho menor, lo que resulta en una aceleración mucho mayor. Por otro lado, la reina, al tener una masa mayor, experimenta una aceleración mucho menor bajo la misma fuerza. Esto ilustra claramente cómo la masa afecta la aceleración de un objeto cuando se aplica una fuerza constante, tal como lo establece la segunda ley de Newton.
+                    </p>
+</div>
+</div>
+</div>
+</div>
+<aside class="w-full lg:w-[400px] flex-shrink-0 bg-white dark:bg-[#18342f] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-[#224942] flex flex-col h-auto lg:h-full overflow-y-auto">
+<div class="p-6 lg:p-8 flex flex-col gap-8">
+<div class="flex items-center justify-between">
+<h3 class="text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">experiment</span>
+                    Controles Experimentales
+                </h3>
+<div class="px-2 py-1 rounded bg-green-500/10 text-green-500 text-xs font-bold uppercase tracking-wide border border-green-500/20">Ready</div>
+</div>
+<div class="space-y-4">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">1. Selecciona el objeto </label>
+<div class="grid grid-cols-3 gap-2">
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border border-slate-200 dark:border-[#224942] bg-slate-50 dark:bg-[#102320] hover:border-slate-300 dark:hover:border-slate-500 transition-all opacity-60 hover:opacity-100" data-piece="king">
+<span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform">chess_king</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-600 dark:text-slate-300">Rey</div>
+<div class="text-[10px] text-slate-500 font-mono">30 kg</div>
+</div>
+</button>
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border border-slate-200 dark:border-[#224942] bg-slate-50 dark:bg-[#102320] hover:border-slate-300 dark:hover:border-slate-500 transition-all opacity-60 hover:opacity-100" data-piece="queen">
+<span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform">chess_queen</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-600 dark:text-slate-300">Reina </div>
+<div class="text-[10px] text-slate-500 font-mono">25 kg</div>
+</div>
+</button>
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border border-slate-200 dark:border-[#224942] bg-slate-50 dark:bg-[#102320] hover:border-slate-300 dark:hover:border-slate-500 transition-all opacity-60 hover:opacity-100" data-piece="rook">
+<span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform">chess_rook</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-600 dark:text-slate-300">Torre</div>
+<div class="text-[10px] text-slate-500 font-mono">20 kg</div>
+</div>
+</button>
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border border-slate-200 dark:border-[#224942] bg-slate-50 dark:bg-[#102320] hover:border-slate-300 dark:hover:border-slate-500 transition-all opacity-60 hover:opacity-100" data-piece="bishop">
+<span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform">chess_bishop</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-600 dark:text-slate-300">Alfil</div>
+<div class="text-[10px] text-slate-500 font-mono">15 kg</div>
+</div>
+</button>
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border border-slate-200 dark:border-[#224942] bg-slate-50 dark:bg-[#102320] hover:border-slate-300 dark:hover:border-slate-500 transition-all opacity-60 hover:opacity-100" data-piece="knight">
+<span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform">chess_knight</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-600 dark:text-slate-300">Caballo</div>
+<div class="text-[10px] text-slate-500 font-mono">15 kg</div>
+</div>
+</button>
+<button class="relative group flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-[0_0_10px_rgba(13,242,204,0.1)]" data-piece="pawn">
+<div class="absolute top-1.5 right-1.5 size-3 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[8px] text-black font-bold">check</span>
+</div>
+<span class="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform">chess_pawn</span>
+<div class="text-center leading-tight">
+<div class="font-bold text-xs text-slate-900 dark:text-white">Peón</div>
+<div class="text-[10px] text-slate-600 dark:text-slate-300 font-mono">5 kg</div>
+</div>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">2. Aplicar fuerza (F)</label>
+<span class="font-mono text-xl font-bold text-primary">50 <span class="text-sm text-slate-500 dark:text-slate-400">N</span></span>
+</div>
+<div class="relative py-2">
+<input class="w-full h-2 bg-slate-200 dark:bg-[#224942] rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="50"/>
+<div class="flex justify-between mt-2 text-xs font-mono text-slate-400">
+<span>0N</span>
+<span>50N</span>
+<span>100N</span>
+</div>
+</div>
+</div>
+<div class="bg-slate-900 dark:bg-[#102320] rounded-xl p-5 border border-slate-800 dark:border-[#224942] shadow-lg relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 size-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors"></div>
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Calculo</h4>
+<div class="flex flex-col items-center justify-center gap-4 py-2 font-mono">
+<div class="text-lg text-slate-300">
+<span class="text-primary font-bold">F</span> = <span class="text-white">m</span> × <span class="text-white border-b-2 border-primary/50">a</span>
+</div>
+<div class="w-full h-px bg-slate-800 dark:bg-[#224942]"></div>
+<div class="flex items-center gap-3 text-sm">
+<div class="flex flex-col items-center">
+<span class="text-primary font-bold text-lg">50</span>
+<span class="text-[10px] text-slate-500">Fuerza (N)</span>
+</div>
+<span class="text-slate-500">=</span>
+<div class="flex flex-col items-center">
+<span class="text-white font-bold text-lg">5</span>
+<span class="text-[10px] text-slate-500">Masa (kg)</span>
+</div>
+<span class="text-slate-500">×</span>
+<div class="flex flex-col items-center p-1 rounded bg-primary/10 border border-primary/30">
+<span class="text-white font-bold text-lg">10</span>
+<span class="text-[10px] text-primary">Acc (m/s²)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 space-y-4">
+<div class="flex justify-between items-center p-4 bg-primary/5 border border-primary/20 rounded-lg">
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Aceleración resultante:</span>
+<span class="text-2xl font-black font-mono text-primary">10.0 <span class="text-sm font-normal text-slate-500">m/s²</span></span>
+</div>
+<button class="w-full bg-primary hover:bg-[#0bcbb0] text-background-dark font-bold text-lg py-4 px-6 rounded-xl shadow-[0_0_20px_rgba(13,242,204,0.3)] hover:shadow-[0_0_30px_rgba(13,242,204,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">play_arrow</span>
+                    Empezar Simulación
+                </button>
+</div>
+</div>
+</aside>
+</main>
+
+<script>
+  // Estado de la aplicación
+  const state = {
+    pieces: {
+      'king': { name: 'King', mass: 30, icon: 'chess_king' },
+      'queen': { name: 'Queen', mass: 25, icon: 'chess_queen' },
+      'rook': { name: 'Rook', mass: 20, icon: 'chess_rook' },
+      'bishop': { name: 'Bishop', mass: 15, icon: 'chess_bishop' },
+      'knight': { name: 'Knight', mass: 15, icon: 'chess_knight' },
+      'pawn': { name: 'Pawn', mass: 5, icon: 'chess_pawn' }
+    },
+    selectedPiece: 'pawn',
+    force: 50,
+    isAnimating: false
+  };
+
+  // Inicializar elementos
+  function initializeControls() {
+    console.log('Inicializando controles...');
+    
+    // Botones de piezas
+    const pieceButtons = document.querySelectorAll('[data-piece]');
+    console.log('Encontrados', pieceButtons.length, 'botones de piezas');
+    
+    pieceButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        selectPiece(button.dataset.piece);
+      });
+    });
+
+    // Slider de fuerza
+    const forceSlider = document.querySelector('input[type="range"]');
+    if (forceSlider) {
+      forceSlider.addEventListener('input', (e) => {
+        updateForce(parseInt(e.target.value));
+      });
+    }
+
+    // Botón Simulate Motion - búsqueda correcta
+    const allButtons = document.querySelectorAll('button');
+    let simulateButton = null;
+    
+    allButtons.forEach(btn => {
+      if (btn.textContent.includes('Simulate Motion')) {
+        simulateButton = btn;
+        console.log('Botón Simulate Motion encontrado');
+      }
+    });
+    
+    if (simulateButton) {
+      simulateButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        startSimulation();
+      });
+      console.log('Botón Simulate Motion registrado correctamente');
+    } else {
+      console.error('No se encontró el botón Simulate Motion');
+    }
+
+    // Actualizar vista inicial
+    updateDisplay();
+  }
+
+  // Seleccionar pieza
+  function selectPiece(pieceKey) {
+    console.log('Seleccionando pieza:', pieceKey);
+    state.selectedPiece = pieceKey;
+    
+    // Actualizar botones visuales
+    const buttons = document.querySelectorAll('[data-piece]');
+    buttons.forEach(btn => {
+      const checkmark = btn.querySelector('div.absolute.top-1\\.5');
+      
+      if (btn.dataset.piece === pieceKey) {
+        // Agregar estilos de selección
+        btn.classList.remove('opacity-60', 'hover:opacity-100');
+        btn.classList.add('border-2', 'border-primary', 'bg-primary/10');
+        
+        // Agregar checkmark si no existe
+        if (!checkmark) {
+          const check = document.createElement('div');
+          check.className = 'absolute top-1.5 right-1.5 size-3 rounded-full bg-primary flex items-center justify-center';
+          check.innerHTML = '<span class="material-symbols-outlined text-[8px] text-black font-bold">check</span>';
+          btn.appendChild(check);
+        }
+      } else {
+        // Remover estilos de selección
+        btn.classList.remove('border-2', 'border-primary', 'bg-primary/10', 'shadow-[0_0_10px_rgba(13,242,204,0.1)]');
+        btn.classList.add('opacity-60', 'hover:opacity-100');
+        
+        // Remover checkmark
+        if (checkmark) {
+          checkmark.remove();
+        }
+      }
+    });
+
+    updateDisplay();
+  }
+
+  // Actualizar fuerza
+  function updateForce(value) {
+    state.force = value;
+    updateDisplay();
+  }
+
+  // Actualizar pantalla
+  function updateDisplay() {
+    const piece = state.pieces[state.selectedPiece];
+    const mass = piece.mass;
+    const force = state.force;
+    const acceleration = (force / mass).toFixed(2);
+
+    console.log(`Actualizando: Pieza=${piece.name}, Masa=${mass}kg, Fuerza=${force}N, Aceleración=${acceleration}m/s²`);
+
+    // Actualizar icono y masa en simulación
+    const pieceIcon = document.querySelector('div.size-20.bg-slate-100 span.material-symbols-outlined');
+    const massLabel = document.querySelector('div.absolute.-bottom-8.left-1\\/2');
+    
+    if (pieceIcon) {
+      pieceIcon.textContent = piece.icon;
+      console.log('Icono actualizado a:', piece.icon);
+    }
+    
+    if (massLabel) {
+      massLabel.textContent = `m = ${mass}kg`;
+      console.log('Masa actualizada a:', mass);
+    }
+
+    // Actualizar valor de fuerza en el header
+    const forceDisplay = document.querySelector('span.font-mono.text-xl.font-bold.text-primary');
+    if (forceDisplay) {
+      forceDisplay.innerHTML = `${force} <span class="text-sm text-slate-500 dark:text-slate-400">N</span>`;
+    }
+
+    // Actualizar slider
+    const slider = document.querySelector('input[type="range"]');
+    if (slider) {
+      slider.value = force;
+    }
+
+    // Actualizar los valores en la ecuación (F = m × a)
+    // Buscamos los tres divs dentro de la ecuación
+    const calcSection = document.querySelector('div.flex.items-center.gap-3.text-sm');
+    if (calcSection) {
+      const divs = calcSection.querySelectorAll('div');
+      if (divs.length >= 3) {
+        // Primer div: Fuerza
+        const forceVal = divs[0].querySelector('span.text-primary');
+        if (forceVal) forceVal.textContent = force;
+        
+        // Segundo div: Masa
+        const massVal = divs[1].querySelector('span.text-white');
+        if (massVal) massVal.textContent = mass;
+        
+        // Tercer div: Aceleración
+        const accelVal = divs[2].querySelector('span.text-white.font-bold');
+        if (accelVal) accelVal.textContent = acceleration;
+      }
+    }
+
+    // Actualizar resultado final (Resulting Acceleration)
+    const resultSection = document.querySelector('div.flex.justify-between.items-center.p-4');
+    if (resultSection) {
+      const accelResult = resultSection.querySelector('span.text-2xl.font-black.font-mono.text-primary');
+      if (accelResult) {
+        accelResult.innerHTML = `${acceleration} <span class="text-sm font-normal text-slate-500">m/s²</span>`;
+      }
+    }
+
+    // Actualizar etiqueta de fuerza en la flecha
+    const forceArrowLabel = document.querySelector('span.absolute.-top-6.left-1\\/2.-translate-x-1\\/2');
+    if (forceArrowLabel) {
+      forceArrowLabel.textContent = `F = ${force}N`;
+    }
+  }
+
+  // Iniciar simulación
+  function startSimulation() {
+    if (state.isAnimating) {
+      console.log('Ya hay una simulación en progreso');
+      return;
+    }
+    
+    console.log('Iniciando simulación...');
+    state.isAnimating = true;
+    
+    const piece = state.pieces[state.selectedPiece];
+    const mass = piece.mass;
+    const force = state.force;
+    const acceleration = force / mass; // m/s²
+    
+    console.log(`Parámetros: masa=${mass}kg, fuerza=${force}N, aceleración=${acceleration.toFixed(2)}m/s²`);
+    
+    // Encontrar el contenedor de la pieza con mejor especificidad
+    const pieceContainers = document.querySelectorAll('div.relative.group.cursor-pointer.transform');
+    if (pieceContainers.length === 0) {
+      console.error('No se encontró el contenedor de la pieza');
+      state.isAnimating = false;
+      return;
+    }
+    
+    const pieceContainer = pieceContainers[0]; // Tomar el primero (la pieza animada)
+    console.log('Contenedor de pieza encontrado:', pieceContainer);
+
+    // Animar la pieza
+    const duration = 2000; // milisegundos
+    const startTime = Date.now();
+    const maxPixels = 200; // máximo desplazamiento en píxeles
+
+    function animate() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ecuación de movimiento: s = 0.5 * a * t²
+      // Escalamos la aceleración para visualización
+      const scaledAccel = Math.min(acceleration * 5, 20); // limitar para no ir muy rápido
+      const distance = 0.5 * scaledAccel * (progress * progress) * 50; // amplificar para ver movimiento
+      
+      console.log(`Progreso: ${(progress * 100).toFixed(1)}%, Distancia: ${distance.toFixed(1)}px`);
+      
+      pieceContainer.style.transform = `translateX(${distance}px)`;
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Restablecer posición después de un tiempo
+        console.log('Simulación completada, restableciendo posición...');
+        setTimeout(() => {
+          pieceContainer.style.transform = 'translateX(0)';
+          state.isAnimating = false;
+          console.log('Animación restablecida');
+        }, 800);
+      }
+    }
+
+    animate();
+  }
+
+  // Inicializar cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM cargado');
+    initializeControls();
+  });
+</script>
+
+
+</body></html>

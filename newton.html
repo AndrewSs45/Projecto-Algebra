@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Newtonian Chess - Blog Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df2cc",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    backgroundImage: {
+                        'grid-white': "linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .glass-panel {
+            background: rgba(16, 34, 31, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(13, 242, 204, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(13, 242, 204, 0.1);
+        }
+
+        .icon-glow {
+            filter: drop-shadow(0 0 8px rgba(13, 242, 204, 0.4));
+        }
+        
+        /* Specific Scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #10221f; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #224942; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #31685f; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col font-display">
+<!-- Sticky Glass Header -->
+<header class="fixed top-0 left-0 right-0 z-50 glass-panel h-16 flex items-center justify-center px-6">
+<div class="w-full max-w-7xl flex items-center justify-between">
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="size-8 text-primary transition-transform group-hover:rotate-12">
+
+</div>
+<h1 class="text-white text-lg font-bold tracking-tight">Newtonian Chess</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="index.html">Inicio</a>
+<a class="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="lesson.html">Lecciones</a>
+<a class="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="simulator.html">Simulador</a>
+<a class="text-primary text-sm font-medium transition-colors" href="newton.html">Conceptos</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="bg-white/5 border border-white/10 rounded-full py-1.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary w-48 transition-all hover:bg-white/10" placeholder="Search physics..." type="text"/>
+</div>
+<button class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="size-9 rounded-full bg-cover bg-center border border-white/20" data-alt="User avatar profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDeT4P6OxdF56NaHDipMAiq2cBSgnUZ1IMKj_SCnspgWT_ZHDmChiju176RwTcEI_nqxeUHhIHeISb6_jKBtkXeHRSEtCsnxblTJxdlVkXpJ-tXjdygDJI73BH3TumLVXmgtNVysQ0Z4MH9amu82MetjlF-64hl7dgGUnm9lhz_VxncViM_xhzd_L-wcKyYx_igRHO_iEFJRUmeiUdk7S5KxGW3tby9V8k9msOqf6mVNQ_UuCqUgp8Dik5AbVIbVpaim_aEYeA1a1g");'></div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow pt-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+<!-- Abstract Background Elements -->
+<div class="absolute inset-0 bg-[size:40px_40px] bg-grid-white opacity-10 pointer-events-none"></div>
+<div class="absolute top-20 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none mix-blend-screen"></div>
+<div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none mix-blend-screen"></div>
+<div class="max-w-7xl mx-auto flex flex-col gap-12 relative z-10">
+<!-- Hero Text -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/10 pb-8">
+<div class="space-y-4 max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        Latest Research
+                    </div>
+<h2 class="text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]">
+                        Insights from the <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Board &amp; Lab</span>
+</h2>
+<p class="text-slate-400 text-lg">
+                        Where grandmaster strategy meets Newtonian mechanics. Exploring the hidden physics behind every move on the 64 squares.
+                    </p>
+</div>
+<div class="flex gap-2">
+<button class="size-10 flex items-center justify-center rounded-full border border-white/10 hover:bg-white/10 text-white transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="size-10 flex items-center justify-center rounded-full border border-white/10 hover:bg-white/10 text-slate-500 transition-colors">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+</div>
+<!-- Blog Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+<!-- Card 1: King's Inertia -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Icons for physics concept -->
+<span class="material-symbols-outlined text-3xl text-white">balance</span>
+<!-- Physics Overlay Icon -->
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">scale</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">PHYS-101</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Primera Ley de Newton: Inercia Estratégica</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">S<sub>t</sub> = S<sub>t</sub></div>
+<div class="text-xs text-slate-400">Tablero en equilibrio permanece en su estado</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            El tablero de ajedrez posee una resistencia natural al cambio. El estado inicial debe romperse mediante un operador de movimiento O para alterar el equilibrio.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Fundamental</span>
+</div>
+</div>
+</article>
+<!-- Card 2: Rook's Reach -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Rook Icon -->
+<span class="material-symbols-outlined text-3xl text-white">straighten</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">trending_flat</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">VEC-204</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Vector de Desplazamiento</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">v = √(Δx² + Δy²)</div>
+<div class="text-xs text-slate-400">Magnitud del vector de movimiento</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            La torre se desplaza mediante vectores traslacionales en el tablero. La magnitud del desplazamiento indica el control de archivos y rangos.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>\u00c1lgebra Lineal</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Knight's Trajectory -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Knight Icon -->
+<span class="material-symbols-outlined text-3xl text-white">polyline</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">gesture</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">KIN-301</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Vector Compuesto: Movimiento del Caballo</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">v = (±2, ±1) ∪ (±1, ±2)</div>
+<div class="text-xs text-slate-400">Vector resultante ignora colisiones intermedias</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            El caballo es único: su movimiento es un vector compuesto resultante que no sigue trayectorias lineales ni diagonales. Salta sobre obstáculos.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Cinem\u00e1tica</span>
+</div>
+</div>
+</article>
+<!-- Card 4: Segunda Ley de Newton -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Force Icon -->
+<span class="material-symbols-outlined text-3xl text-white">air</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">bolt</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">PHYS-201</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Segunda Ley: Fuerza de Impacto</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">F = m* × a</div>
+<div class="text-xs text-slate-400">Donde m* = masa estratégica</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            Una reina con mayor masa estratégica genera mayor alteración en el campo de control del oponente que un peón, en la misma jugada.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Din\u00e1mico</span>
+</div>
+</div>
+</article>
+<!-- Card 5: Momento Lineal -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Bishop Icon -->
+<span class="material-symbols-outlined text-3xl text-white">analytics</span>
+
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">velocity</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">DIN-305</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Momento Lineal del Juego</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">p = m × v</div>
+<div class="text-xs text-slate-400">Momento = masa estratégica × velocidad</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            El momento total del juego indica control dinámico. Si un bando tiene piezas pesadas avanzando (v alta), domina el sistema.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Cinemática</span>
+</div>
+</div>
+</article>
+<!-- Card 6: Tercera Ley de Newton -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Collision Icon for Time -->
+<span class="material-symbols-outlined text-3xl text-white">flash_on</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">bolt</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">PHYS-303</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Tercera Ley: Acción y Reacción</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">v₁ → Aniquilación ← v₂</div>
+<div class="text-xs text-slate-400">Colisión Terminal (Captura)</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            En un sistema cerrado de suma cero, toda acción busca inducir una respuesta. Las capturas representan colisiones donde el vector atacante desplaza al estacionario.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Estrategia</span>
+</div>
+</div>
+</article>
+<!-- Card 7: Cinemática -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Motion Icon -->
+<span class="material-symbols-outlined text-3xl text-white">speed</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">timer</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">KIN-205</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Cinemática: Posición vs Tiempo</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">x = x₀ + v·t + ½·a·t²</div>
+<div class="text-xs text-slate-400">Posición en función del tiempo</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            Ecuación de movimiento que describe la posición de una pieza considerando velocidad inicial, aceleración y tiempo transcurrido.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Física</span>
+</div>
+</div>
+</article>
+<!-- Card 8: Transformación Lineal -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Matrix/Rotation Icon -->
+<span class="material-symbols-outlined text-3xl text-white">functions</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">grid_3x3</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">LIN-410</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">Simetría: Reflexión del Tablero</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">T(v) = A·v</div>
+<div class="text-xs text-slate-400">Reflexión horizontal para perspectiva opuesta</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            Las transformaciones lineales modelan la simetría especular del tablero. El estado inicial presenta simetría casi perfecta entre piezas blancas y negras.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Álgebra Lineal</span>
+</div>
+</div>
+</article>
+<!-- Card 9: Espacio Vectorial -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-5 group/card">
+<div class="flex justify-between items-start">
+<div class="flex items-center justify-center size-14 rounded-lg bg-gradient-to-br from-white/10 to-transparent border border-white/5 icon-glow">
+<!-- Space/Grid Icon -->
+<span class="material-symbols-outlined text-3xl text-white">apps</span>
+<span class="material-symbols-outlined absolute -bottom-2 -right-2 bg-[#10221f] rounded-full p-0.5 text-primary text-sm border border-primary/30">schema</span>
+</div>
+<span class="text-xs font-mono text-primary/80 bg-primary/10 px-2 py-1 rounded">VEC-100</span>
+</div>
+<div class="space-y-3 flex-1">
+<h3 class="text-xl font-bold text-white group-hover/card:text-primary transition-colors">El Tablero como Espacio Vectorial</h3>
+<div class="bg-slate-900/50 rounded p-3 font-mono text-xs text-center text-primary border border-primary/20 my-2">
+<div class="text-sm font-bold mb-1">V = ℝ⁸ˣ⁸</div>
+<div class="text-xs text-slate-400">Matrices de 8x8 con entradas reales</div>
+</div>
+<p class="text-slate-400 text-sm leading-relaxed">
+                            El tablero de ajedrez es un espacio vectorial acotado. Cada posición es un vector en R⁸ˣ⁸, donde la dimensión total del sistema es 64.
+                        </p>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-start">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Fundamental</span>
+</div>
+</div>
+</article>
+</div>
+
+</div>
+</main>
+<!-- Footer -->
+<footer class="border-t border-white/10 bg-[#0e1c1a] pt-16 pb-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none"></div>
+<div class="layout-container flex flex-col items-center max-w-7xl mx-auto px-6 relative z-10">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 w-full mb-12">
+<div class="col-span-1 md:col-span-2 space-y-4">
+<div class="flex items-center gap-3 text-white">
+
+<h2 class="text-xl font-bold">Newtonian Chess</h2>
+</div>
+<p class="text-slate-400 max-w-sm">
+                        Redefining the 64 squares through the lens of physics. Join our community of thinkers, players, and scientists.
+                    </p>
+</div>
+<div class="flex flex-col gap-3">
+<h3 class="text-white font-semibold mb-2">Navigate</h3>
+<a class="text-slate-400 hover:text-primary transition-colors" href="index.html">Home</a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="lesson.html">Lessons</a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="simulator.html">Simulator</a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="newton.html">Newton's Laws</a>
+</div>
+</div>
+<div class="w-full h-px bg-white/10 mb-8"></div>
+<div class="flex flex-col md:flex-row justify-between items-center w-full gap-4">
+<p class="text-slate-500 text-sm">© 2024 Newtonian Chess. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-slate-500 hover:text-white text-sm" href="index.html">Back to Home</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

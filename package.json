@@ -1,0 +1,14 @@
+{
+  "name": "chess-physics",
+  "version": "1.0.0",
+  "description": "Chess Physics: Vectores y Leyes de Newton - Plataforma Educativa Interactiva",
+  "type": "module",
+  "scripts": {
+    "dev": "npx http-server . -p 8080 -c-1",
+    "build": "echo 'Build completed. Static site ready in root directory.'",
+    "preview": "npx http-server . -p 8080 -c-1"
+  },
+  "keywords": ["chess", "physics", "vectors", "newton", "education", "interactive"],
+  "author": "Chess Physics Team",
+  "license": "MIT"
+}
